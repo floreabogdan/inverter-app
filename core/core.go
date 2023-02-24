@@ -15,6 +15,8 @@ type Core struct {
 	Bms       map[string]bms.Bms
 	Grid      map[string]grid.Grid
 	Inverter  map[string]inverter.Inverter
+
+	Devices map[string]map[string]map[string]string
 }
 
 func New() *Core {
@@ -23,55 +25,103 @@ func New() *Core {
 		Bms:       make(map[string]bms.Bms),
 		Grid:      make(map[string]grid.Grid),
 		Inverter:  make(map[string]inverter.Inverter),
+
+		Devices: map[string]map[string]map[string]string{
+			"inverter": {
+				"dummyInverter": {
+					"type":   "dummy",
+					"config": "",
+
+					"bms":     "dummyBms",
+					"gridIn":  "dummyGridIn",
+					"gridOut": "dummyGridOut",
+
+					"mqttHost": "",
+					"mqttPort": "",
+					"mqttUser": "",
+					"mqttPass": "",
+
+					"influxHost":     "",
+					"influxPort":     "",
+					"influxUser":     "",
+					"influxPass":     "",
+					"influxDatabase": "",
+				},
+			},
+			"bms": {
+				"dummyBms": {
+					"type":   "dummy",
+					"config": "",
+
+					"mqttHost": "",
+					"mqttPort": "",
+					"mqttUser": "",
+					"mqttPass": "",
+
+					"influxHost":     "",
+					"influxPort":     "",
+					"influxUser":     "",
+					"influxPass":     "",
+					"influxDatabase": "",
+				},
+			},
+			"grid": {
+				"dummyGridIn": {
+					"type":   "dummy",
+					"config": "",
+
+					"mqttHost": "",
+					"mqttPort": "",
+					"mqttUser": "",
+					"mqttPass": "",
+
+					"influxHost":     "",
+					"influxPort":     "",
+					"influxUser":     "",
+					"influxPass":     "",
+					"influxDatabase": "",
+				},
+				"dummyGridOut": {
+					"type":   "dummy",
+					"config": "",
+
+					"mqttHost": "",
+					"mqttPort": "",
+					"mqttUser": "",
+					"mqttPass": "",
+
+					"influxHost":     "",
+					"influxPort":     "",
+					"influxUser":     "",
+					"influxPass":     "",
+					"influxDatabase": "",
+				},
+			},
+		},
 	}
 }
 
 func (c *Core) Run() {
-	inverterList := []map[string]interface{}{
-		{
-			"id":   "dummyInverter",
-			"type": "dummy",
+	//@todo setup local db
 
-			"config":  "",
-			"bms":     "dummyBms",
-			"gridIn":  "dummyGridIn",
-			"gridOut": "dummyGridOut",
-		},
-	}
+	//@todo setup mqtt
 
-	bmsList := []map[string]interface{}{
-		{
-			"id":   "dummyBms",
-			"type": "dummy",
+	//@todo setup influxdb
 
-			"config": "",
-		},
-	}
+	//@todo load devices list
 
-	gridList := []map[string]interface{}{
-		{
-			"id":   "dummyGridIn",
-			"type": "dummy",
+	// register bms.
+	c.Bms = bms.LoadBms(c.Devices["bms"])
 
-			"config": "",
-		},
-		{
-			"id":   "dummyGridOut",
-			"type": "dummy",
-
-			"config": "",
-		},
-	}
-
-	// register bms
-	c.Bms = bms.LoadBms(bmsList)
-
-	// register grid
-	c.Grid = grid.LoadGrid(gridList)
+	// register grid.
+	c.Grid = grid.LoadGrid(c.Devices["grid"])
 
 	// register inverters.
-	c.Inverter = inverter.LoadInverters(inverterList, c.Bms, c.Grid)
+	c.Inverter = inverter.LoadInverters(c.Devices["inverter"])
 
+	//@todo start sync services
+
+	// start web engine.
 	err := c.WebEngine.Run()
 	if err != nil {
 		log.Fatal(err)

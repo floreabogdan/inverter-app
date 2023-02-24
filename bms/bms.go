@@ -10,17 +10,16 @@ type Bms interface {
 	GetConfig() string
 }
 
-func LoadBms(gridData []map[string]interface{}) map[string]Bms {
+func LoadBms(gridData map[string]map[string]string) map[string]Bms {
 	bmsList := make(map[string]Bms)
 
-	for _, inv := range gridData {
-		id := fmt.Sprint(inv["id"])
-		bmsType := fmt.Sprint(inv["type"])
-		config := fmt.Sprint(inv["config"])
+	for key, bmsInfo := range gridData {
+		bmsType := fmt.Sprint(bmsInfo["type"])
+		config := fmt.Sprint(bmsInfo["config"])
 
 		switch bmsType {
 		case "dummy":
-			bmsList[id] = dummy.New(config)
+			bmsList[key] = dummy.New(config)
 			break
 		}
 	}

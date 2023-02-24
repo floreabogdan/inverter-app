@@ -22,7 +22,8 @@ func (d *Api) initRoutes() {
 		}
 
 		c.JSON(200, gin.H{
-			"response": inverter.GetConfig(),
+			"response": inverter.GetData(),
+			"config":   inverter.GetConfig(),
 		})
 	})
 }

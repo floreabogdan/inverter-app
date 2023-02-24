@@ -10,17 +10,16 @@ type Grid interface {
 	GetConfig() string
 }
 
-func LoadGrid(gridData []map[string]interface{}) map[string]Grid {
+func LoadGrid(gridData map[string]map[string]string) map[string]Grid {
 	gridList := make(map[string]Grid)
 
-	for _, inv := range gridData {
-		id := fmt.Sprint(inv["id"])
-		gridType := fmt.Sprint(inv["type"])
-		config := fmt.Sprint(inv["config"])
+	for key, gridInfo := range gridData {
+		gridType := fmt.Sprint(gridInfo["type"])
+		config := fmt.Sprint(gridInfo["config"])
 
 		switch gridType {
 		case "dummy":
-			gridList[id] = dummy.New(config)
+			gridList[key] = dummy.New(config)
 			break
 		}
 	}
